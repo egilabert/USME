@@ -14,20 +14,20 @@ function login(){
 	var loading_icon = '<img src="img/ajax-loader.gif">'; 
 
 	if(e == "" || p == ""){
-		_("status").style.display = "block";
-		_("status").innerHTML = "Fill out all of the form data";
+		$('#alerts').html('<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a><strong>Error!</strong> Fill out the form data! please, try again.</div>');
 	} else {
-		//_("loginbtn").style.display = "none";
 		_("status").innerHTML = loading_icon;
 		var ajax = ajaxObj("POST", "index.php");
         ajax.onreadystatechange = function() {
 	        if(ajaxReturn(ajax) == true) {
+	        	_("status").innerHTML = "";
 	            if($.trim(ajax.responseText) == "login_failed"){
-	            	_("status").style.display = "block";
-					_("status").innerHTML = "Login unsuccessful, please try again.";
+					$('#alerts').html('<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a><strong>Error!</strong> Login unsuccessful, email adress or password are not correct, please try again.</div>');
 					_("loginbtn").style.display = "block";
 				}
-				else {
+				else if ($.trim(ajax.responseText) == "login_failed empty fields") {
+					$('#alerts').html('<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a><strong>Error!</strong> Fill out the form data! please, try again.</div>');
+				} else {
 					window.location = "home.php?u="+ajax.responseText;
 				}
 	        }
@@ -118,98 +118,6 @@ function addAdmin(){
 		}
 	}
 	ajax.send("action=add_admin&n="+n);
-}
-
-function newPost(){
-	var data = _('new_post').value;
-	if(data == ""){
-		alert("Type something first weenis");
-		return false;
-	}
-	_("postBtn").disabled = true;
-	var ajax = ajaxObj("POST", "php_parsers/group_parser.php");
-	ajax.onreadystatechange = function() {
-		if(ajaxReturn(ajax) == true) {
-			var datArray = ajax.responseText.split("|"); 
-			if($.trim(datArray[0]) == "post_ok"){
-				var sid = datArray[1];
-				data = data.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br />").replace(/\r/g,"<br />");
-				var currentHTML = _("listBlabs").innerHTML;				
-				_("listBlabs").innerHTML = '<div id="pB_'+sid+'" class="status_boxes"><div><b>Posted by you just now prova:</b> <span class="pull-right" id="sdB_'+sid+'"><a href="#" class="glyphicon glyphicon-remove" onclick="return false;" onmousedown="deleteStatusGroup(\''+sid+'\',\'pB_'+sid+'\');" title="Delete this status and its replies"></a></span><br />'+data+'</div></div><div id="replytoMainPost'+sid+'"></div><textarea id="reply_post_'+sid+'" rows="1" class="form-control replytextGroup" placeholder="Reply to this..."></textarea><button id="reBtn_'+sid+'" class="btn btn-default small-margin" onclick="replyPost(\''+sid+'\')">Reply</button>'+currentHTML; 	
-				_("postBtn").disabled = false;
-				_('new_post').value = "";
-			} else {
-				alert(ajax.responseText);
-			}
-		}
-	}
-	ajax.send("action=new_post&data="+data);
-}
-function replyPost(sid){
-	var ta = "reply_post_"+sid;
-	var data = _(ta).value;
-	if(data == ""){
-		alert("Type something first weenis");
-		return false;
-	}
-	var ajax = ajaxObj("POST", "php_parsers/group_parser.php");
-	ajax.onreadystatechange = function() {
-		if(ajaxReturn(ajax) == true) {
-			var datArray = ajax.responseText.split("|");
-			//_("pB_"+sid).innerHTML += $.trim(datArray[0]);
-			//_("pB_"+sid).innerHTML += '<br>';
-			//_("pB_"+sid).innerHTML += $.trim(datArray[1]);
-			if($.trim(datArray[0]) == "reply_ok"){
-				var rid = datArray[1];
-				data = data.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br />").replace(/\r/g,"<br />");
-				_("replytoMainPost"+sid).innerHTML += '<div id="rpB_'+rid+'" class="reply_boxes pull-right"><div><b>Reply by you just now:</b><span class="pull-right" id="sdB_'+rid+'"><a href="#" class="small-margin glyphicon glyphicon-remove" onclick="return false;" onmousedown="deleteReplyGroup(\''+rid+'\',\'rpB_'+rid+'\');" title="Delete this comment"></a></span><br />'+data+'</div></div>';
-				_(ta).value = "";
-			} else {
-				alert(ajax.responseText);
-			}
-		}
-	}
-	ajax.send("action=post_reply&sid="+sid+"&data="+data);
-}
-
-function deleteStatusGroup(statusid,statusbox){
-	var conf = confirm("Press OK to confirm deletion of this status and its replies");
-	if(conf != true){
-		return false;
-	}
-	var ajax = ajaxObj("POST", "php_parsers/group_parser.php");
-	ajax.onreadystatechange = function() {
-		if(ajaxReturn(ajax) == true) {
-			if($.trim(ajax.responseText) == "delete_ok"){
-				//_(statusbox).style.display = 'none';
-				_("pB_"+statusid).style.display = 'none';
-				_("sdB_"+statusid).style.display = 'none';
-				_("reply_post_"+statusid).style.display = 'none';
-				_("reBtn_"+statusid).style.display = 'none';
-			} else {
-				alert(ajax.responseText);
-			}
-		}
-	}
-	ajax.send("action=delete_status&statusid="+statusid);
-}
-function deleteReplyGroup(replyid,replybox){
-	var conf = confirm("Press OK to confirm deletion of this reply");
-	if(conf != true){
-		return false;
-	}
-	var ajax = ajaxObj("POST", "php_parsers/group_parser.php");
-	ajax.onreadystatechange = function() {
-		if(ajaxReturn(ajax) == true) {
-			if($.trim(ajax.responseText) == "delete_ok"){
-				_("rpB_"+replyid).style.display = 'none';
-				_("sdB_"+replyid).style.display = 'none';
-			} else {
-				alert(ajax.responseText);
-			}
-		}
-	}
-	ajax.send("action=delete_reply&replyid="+replyid);
 }
 
 function checkusername(){
@@ -492,15 +400,13 @@ function signup(){
 	//var sig = "signup";
 	
 	if(n == "" || e == "" || p1 == ""){
-			status.innerHTML = "Fill out all of the form data";
+			$('#alerts').html('<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a><strong>Error!</strong> Fill out the form data! please, try again.</div>');
 		} else if(ln == "") {
-			status.innerHTML = "Please use Google autocomplete adress";
+			$('#alerts').html('<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a><strong>Error!</strong> Please use Google autocomplete adress.</div>');
 		} else if( _("terms").style.display == "none"){
-			status.innerHTML = "Please view the terms of use";
+			$('#alerts').html('<div class="alert alert-info"><a href="#" class="close" data-dismiss="alert">&times;</a><strong></strong> Please view the TERMS OF USE</div>');
 		} else {
 			_("registerbtn").style.display = "none"; //hide singup button
-			/*status.innerHTML = "n="+n+"&e="+e+"&p1="+p1+"&ln="+ln+"&lat="+lat+"&lng="+lng+"&loc="+loc+"&loct="+loct+"&fa="+fa+"&v="+v+"&st="+st+"&pc="+pc+"&lcl="+lcl+"&co="+co+"&cs="+cs+"&admin="+admin+"&idloc="+idloc+"&ref="+ref; //please wait or GIF
-			return false;*/
 			var request = $.ajax({
 			  url: "php_parsers/register.php",
 			  type: "POST",
@@ -509,33 +415,68 @@ function signup(){
 			});
 			 
 			request.done(function( msg ) {
-				status.innerHTML = msg;
 		        if($.trim(msg) != "signup_success"){ //the message has to be send by php server side
-					status.innerHTML = "La respuesta de Ajax no ha sido signup_success pero "+msg;
+					status.innerHTML = msg;
 					_("registerbtn").style.display = "block";
 				} else {
-					_("registrationform").innerHTML = "OK "+u+", check your email inbox and junk mail box at <u>"+e+"</u> in a moment to complete the sign up process by activating your account. You will not be able to do anything on the site until you successfully activate your account.";					
+					status.innerHTML = "";
+					$('#alerts').html('<div class="alert alert-success"><a href="#" class="close" data-dismiss="alert">&times;</a><strong>OK</strong> '+n+', check your email inbox and junk mail box at <u>'+e+'</u> in a moment to complete the sign up process by activating your account. You will not be able to do anything on the site until you successfully activate your account.</div>');
+					$("#form2").hide();
+					$("#form10").hide();
+					$("#views_tou").hide();
+					$("#fade_legal").css("display", "none");
+			        $("#legal_overlay").fadeOut( "1000" );
+			        $('#terms').fadeOut( "1000" );
+					$("#fade_small").css("display", "none");
+                	$("#register_overlay").hide();
+                	$('#form3').val("");
+                	$('#form4').val("");
+                	$('#form3').fadeIn( "500" );
+                	$('#form4').fadeIn( "500" );
 				}
-			  	//$( '#mySearch-body' ).html( msg );
 			});
 			 
 			request.fail(function( jqXHR, textStatus ) {
 			  alert( "Request failed: " + textStatus );
 			});
-
-	        /*var ajax = ajaxObj("POST", "php_parsers/register.php"); //set up ajax objects
-	        ajax.onreadystatechange = function() {
-		    if(ajaxReturn(ajax) == true) { //response text is back
-		    	status.innerHTML = ajax.responseText;
-		        if($.trim(ajax.responseText) != "signup_success"){ //the message has to be send by php server side
-					status.innerHTML = "La respuesta de Ajax no ha sido signup_success pero "+ajax.responseText;
-					_("registerbtn").style.display = "block";
-				} else {
-					_("registrationform").innerHTML = "OK "+u+", check your email inbox and junk mail box at <u>"+e+"</u> in a moment to complete the sign up process by activating your account. You will not be able to do anything on the site until you successfully activate your account.";					}
-		        }
-	        }
-       		ajax.send("n="+n+"&e="+e+"&p1="+p1+"&ln="+ln+"&lat="+lat+"&lng="+lng+"&loc="+loc+"&loct="+loct+"&fa="+fa+"&v="+v+"&st="+st+"&pc="+pc+"&lcl="+lcl+"&co="+co+"&cs="+cs+"&admin="+admin+"&idloc="+idloc+"&ref="+ref);//+"&ic="+ic);*/
         }
+}
+
+function uploadFile(){
+	var file = _("file1").files[0];
+	//alert(file.name+" | "+file.size+" | "+file.type);
+	var formdata = new FormData();
+	formdata.append("file1", file);
+	var ajax = new XMLHttpRequest();
+	ajax.upload.addEventListener("progress", progressHandler, false);
+	ajax.addEventListener("load", completeHandler, false);
+	ajax.addEventListener("error", errorHandler, false);
+	ajax.addEventListener("abort", abortHandler, false);
+	ajax.open("POST", "php_parsers/photo_system.php");
+	ajax.send(formdata);
+}
+function progressHandler(event){
+	//_("loaded_n_total").innerHTML = "Uploaded "+event.loaded+" bytes of "+event.total;
+	var percent = (event.loaded / event.total) * 100;
+	_("progressBar").value = Math.round(percent);
+	_("status_loading").innerHTML = Math.round(percent)+"% uploaded... please wait";
+}
+function completeHandler(event){
+	var datArray = event.target.responseText.split("|");
+	var res = datArray[0].substring(0,5);
+	if($.trim(res) == "ERROR") {
+		_("status_loading").innerHTML = event.target.responseText;
+		_("progressBar").value = 0;
+	} else {
+		_("progressBar").value = 0;
+		_("profile_pic_box").innerHTML = '<a id="imageBtn" href="#" onclick="return false;" onmousedown="toggleElement(\'avatar_form\')">Edit profile image</a><form id="avatar_form" enctype="multipart/form-data" method="post"><h4>Change your avatar</h4><input type="file" name="file1" id="file1" data-filename-placement="inside"><p><input type="button" class="btn btn-default" value="Upload" onclick="uploadFile()"></p><progress id="progressBar" value="0" max="100"></progress><p id="status_loading"></p><p id="loaded_n_total"></p></form><img src="user/'+datArray[0]+'/'+datArray[1]+'" alt="'+datArray[0]+'">';
+	}	
+}
+function errorHandler(event){
+	_("status_loading").innerHTML = "Upload Failed";
+}
+function abortHandler(event){
+	_("status_loading").innerHTML = "Upload Aborted";
 }
 
 function imgError(image) {
@@ -560,8 +501,6 @@ function toggleElement(x){
 }
 
 $(document).ready(function(){
-
-  
 
   $("div.navbar-fixed-top").autoHidingNavbar();
 
@@ -633,7 +572,30 @@ $(document).ready(function(){
 		request.fail(function( jqXHR, textStatus ) {
 		  alert( "Request failed: " + textStatus );
 		});
+    });
 
+     $('#newmessage').on('click', function(event) {
+    	var loading_icon = '<img src="img/ajax-loader.gif">';
+    	$('#newmessage').fadeOut( "500" );
+		$('#sendnewmessage').delay(500).fadeIn( "1000" );
+		$( '#myMess-body' ).html( loading_icon );
+		
+		var request = $.ajax({
+		  url: "php_parsers/messaging.php",
+		  type: "POST",
+		  data: { newmess: "newmessage" },
+		  dataType: "html"
+		});
+		 
+		request.done(function( msg ) {
+		  $( '#myMess-body' ).html( msg );
+		});
+		 
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+		/*var pmtemp = '<input id="pmsubject" class="form-control" onkeyup="statusMax(this,30)" placeholder="Subject..."><br />'+'<textarea id="pmtext" rows="4" class="form-control" onkeyup="statusMax(this,250)" placeholder="Send a new private message"></textarea>'; 
+		$( '#myMess-body' ).html( pmtemp );*/
     });
 
     $('#Language').on('click', function(event) {
@@ -655,6 +617,77 @@ $(document).ready(function(){
     	event.preventDefault();
     	$('#myModalSettings').modal('show');
     });
+
+    $('#forgot_pass_button').on('click', function(event) {
+        $("#fade").css("display", "block");
+        $("#forgot_pass_overlay").show();
+        //onclick="document.getElementsByClassName('overlay').style.display='block';document.getElementsByClassName('fade').style.display='block'"
+      });
+
+      $(".alert").alert();
+
+      $('#views_tou').on('click', function(event) {
+        $("#fade_legal").css("display", "block");
+        _("status2").innerHTML = "";
+        $("#legal_overlay").show();
+        $('#terms').delay(500).fadeIn( "1000" );
+        //onclick="document.getElementsByClassName('overlay').style.display='block';document.getElementsByClassName('fade').style.display='block'"
+      });
+
+      $('#forgot_pass_close').on('click', function(event) {
+        $("#fade").css("display", "none");
+        $("#forgot_pass_overlay").hide();
+        //onclick="document.getElementsByClassName('overlay').style.display='block';document.getElementsByClassName('fade').style.display='block'"
+      });
+
+      $('#signupbtn').on('click', function(event) {
+        var e = _("inputEmail").value;
+        var p1 = _("inputPassword1").value;
+        var loading_icon = '<img src="img/ajax-loader.gif">';
+        var status = _("status");
+        if(e == "" || p1 == ""){
+          var message = '<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a><strong>Error!</strong> Fill out the form data! please, try again.</div>';
+          $('#alerts').html(message);
+          } else {
+            status.innerHTML = loading_icon;
+            var request = $.ajax({
+              url: "php_parsers/checkemail.php",
+              type: "POST",
+              data: { email: e },
+              dataType: "html"
+            });
+            request.done(function( msg ) {
+              status.innerHTML = "";
+              $('#alerts').html( msg );
+              if (msg == 'OK') {
+                $('#form3').fadeOut( "500" );
+                $('#form4').fadeOut( "500" );
+                $('#forgot_pass_button').fadeOut( "500" );
+                $('#form2').delay(499).fadeIn( "1000" );
+                $('#form10').delay(499).fadeIn( "1000" );
+                $("#fade_small").css("display", "block");
+                $("#register_overlay").show();
+              }
+            });
+             
+            request.fail(function( jqXHR, textStatus ) {
+              alert( "Request failed: " + textStatus );
+            });
+        }
+      });
+
+      $('#register_close').on('click', function(event) {
+        $('#form2').fadeOut( "500" );
+        $('#form10').fadeOut( "500" );
+        $("#fade_small").css("display", "none");
+        $("#register_overlay").hide();
+        $('#form3').fadeIn( "1000" );
+        $('#form4').fadeIn( "1000" );
+        $('#forgot_pass_button').fadeIn( "1000" );
+        //onclick="document.getElementsByClassName('overlay').style.display='block';document.getElementsByClassName('fade').style.display='block'"
+      });
+
+
 
     $('.notifications_list_element').on('click', function(e){
     	event.preventDefault(e); 
@@ -684,32 +717,6 @@ $(document).ready(function(){
     });
 
     //$("#pers_mens").chosen();
-
-    $('#newmessage').on('click', function(event) {
-    	var loading_icon = '<img src="img/ajax-loader.gif">';
-    	$('#newmessage').fadeOut( "500" );
-		$('#sendnewmessage').delay(500).fadeIn( "1000" );
-		$( '#myMess-body' ).html( loading_icon );
-		
-		var request = $.ajax({
-		  url: "php_parsers/messaging.php",
-		  type: "POST",
-		  data: { newmess: "newmessage" },
-		  dataType: "html"
-		});
-		 
-		request.done(function( msg ) {
-		  $( '#myMess-body' ).html( msg );
-		});
-		 
-		request.fail(function( jqXHR, textStatus ) {
-		  alert( "Request failed: " + textStatus );
-		});
-
-		/*var pmtemp = '<input id="pmsubject" class="form-control" onkeyup="statusMax(this,30)" placeholder="Subject..."><br />'+'<textarea id="pmtext" rows="4" class="form-control" onkeyup="statusMax(this,250)" placeholder="Send a new private message"></textarea>'; 
-		$( '#myMess-body' ).html( pmtemp );*/
-
-    });
 
     $('#updatepass').on('click', function(event) {
     	var loading_icon = '<img src="img/ajax-loader.gif">';
@@ -770,6 +777,7 @@ $(document).ready(function(){
 		filter = "all";
     });
 
+///Noooooooooooooootessssssssssssssssss///////////////////////////
     var note = $('#note');
 
     var saveTimer,
@@ -826,8 +834,370 @@ $(document).ready(function(){
 		});
     }
 
+///SKECTHHHHHHHHHHHHH///////////////////////////
+
+    var sketch = $('#sketch');
+
+    var sketch_saveTimer,
+        sketch_lineHeight = parseInt(sketch.css('line-height')),
+        sketch_minHeight = parseInt(sketch.css('min-height')),
+        sketch_lastHeight = sketch_minHeight,
+        sketch_newHeight = 0,
+        sketch_newLines = 0;
+
+    var sketch_countLinesRegex = new RegExp('\n','g');
+    var ididea = "";
+    // The input event is triggered on key press-es,
+    // cut/paste and even on undo/redo.
+
+    sketch.on('input',function(e){
+
+    	var sketch_split = location.search.replace('?', '').split('=');
+    	ididea = sketch_split[1];
+
+        // Clearing the timeout prevents
+        // saving on every key press
+        clearTimeout(sketch_saveTimer);
+        sketch_saveTimer = setTimeout(ajaxSavesketch, 2000);
+
+        // Count the number of new lines
+        sketch_newLines = sketch.val().match(sketch_countLinesRegex);
+
+        if(!sketch_newLines){
+            sketch_newLines = [];
+        }
+
+        // Increase the height of the sketch (if needed)
+        sketch_newHeight = Math.max((sketch_newLines.length + 1)*sketch_lineHeight, sketch_minHeight);
+
+        // This will increase/decrease the height only once per change
+        if(sketch_newHeight != sketch_lastHeight){
+            sketch.height(sketch_newHeight);
+            sketch_lastHeight = sketch_newHeight;
+        }
+    }).trigger('input');	// This line will resize the sketch on page load
+
+    function ajaxSavesketch(){
+        // Trigger an AJAX POST request to save the sketch
+        var request = $.ajax({url:"php_parsers/sketch.php",data: {sketch: sketch.val(), id: ididea},type: "POST"});
+
+        request.done(function( msg ) {
+		  //$( '#sketch' ).html( msg );
+		});
+
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+    }
+
 
 });
+
+///BMC///////////////////////////
+    var bmc_1 = $('#bmc_1');
+
+    var saveTimer;
+    var ididea = "";
+    // The input event is triggered on key press-es,
+    // cut/paste and even on undo/redo.
+
+    bmc_1.focusout(function(e){
+
+    	var split = location.search.replace('?', '').split('=');
+    	ididea = split[1];
+
+        // Clearing the timeout prevents
+        // saving on every key press
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(ajaxSavebmc_1, 2000);
+    }).trigger('input');	// This line will resize the bmc_1 on page load
+
+    function ajaxSavebmc_1(){
+
+        // Trigger an AJAX POST request to save the bmc_1
+        var request = $.ajax({url:"php_parsers/bmcs.php",data: {bmc_1: bmc_1.val(), id: ididea},type: "POST"});
+
+        request.done(function( msg ) {
+		  //alert( "message saved: " + msg );
+		  //$( '#bmc_1' ).val( msg );
+		});
+
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+    }
+
+    ///BMC///////////////////////////
+    var bmc_2 = $('#bmc_2');
+
+    var saveTimer;
+    var ididea = "";
+    // The input event is triggered on key press-es,
+    // cut/paste and even on undo/redo.
+
+    bmc_2.focusout(function(e){
+
+    	var split = location.search.replace('?', '').split('=');
+    	ididea = split[1];
+
+        // Clearing the timeout prevents
+        // saving on every key press
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(ajaxSavebmc_2, 2000);
+    }).trigger('input');	// This line will resize the bmc_2 on page load
+
+    function ajaxSavebmc_2(){
+
+        // Trigger an AJAX POST request to save the bmc_2
+        var request = $.ajax({url:"php_parsers/bmcs.php",data: {bmc_2: bmc_2.val(), id: ididea},type: "POST"});
+
+        request.done(function( msg ) {
+		  //alert( "message saved: " + msg );
+		  //$( '#bmc_2' ).val( msg );
+		});
+
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+    }
+
+    ///BMC///////////////////////////
+    var bmc_3 = $('#bmc_3');
+
+    var saveTimer;
+    var ididea = "";
+    // The input event is triggered on key press-es,
+    // cut/paste and even on undo/redo.
+
+    bmc_3.focusout(function(e){
+
+    	var split = location.search.replace('?', '').split('=');
+    	ididea = split[1];
+
+        // Clearing the timeout prevents
+        // saving on every key press
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(ajaxSavebmc_3, 2000);
+    }).trigger('input');	// This line will resize the bmc_3 on page load
+
+    function ajaxSavebmc_3(){
+
+        // Trigger an AJAX POST request to save the bmc_3
+        var request = $.ajax({url:"php_parsers/bmcs.php",data: {bmc_3: bmc_3.val(), id: ididea},type: "POST"});
+
+        request.done(function( msg ) {
+		  //alert( "message saved: " + msg );
+		  //$( '#bmc_3' ).val( msg );
+		});
+
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+    }
+
+    ///BMC///////////////////////////
+    var bmc_4 = $('#bmc_4');
+
+    var saveTimer;
+    var ididea = "";
+    // The input event is triggered on key press-es,
+    // cut/paste and even on undo/redo.
+
+    bmc_4.focusout(function(e){
+
+    	var split = location.search.replace('?', '').split('=');
+    	ididea = split[1];
+
+        // Clearing the timeout prevents
+        // saving on every key press
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(ajaxSavebmc_4, 2000);
+    }).trigger('input');	// This line will resize the bmc_4 on page load
+
+    function ajaxSavebmc_4(){
+
+        // Trigger an AJAX POST request to save the bmc_4
+        var request = $.ajax({url:"php_parsers/bmcs.php",data: {bmc_4: bmc_4.val(), id: ididea},type: "POST"});
+
+        request.done(function( msg ) {
+		  //alert( "message saved: " + msg );
+		  //$( '#bmc_4' ).val( msg );
+		});
+
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+    }
+
+    ///BMC///////////////////////////
+    var bmc_5 = $('#bmc_5');
+
+    var saveTimer;
+    var ididea = "";
+    // The input event is triggered on key press-es,
+    // cut/paste and even on undo/redo.
+
+    bmc_5.focusout(function(e){
+
+    	var split = location.search.replace('?', '').split('=');
+    	ididea = split[1];
+
+        // Clearing the timeout prevents
+        // saving on every key press
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(ajaxSavebmc_5, 2000);
+    }).trigger('input');	// This line will resize the bmc_5 on page load
+
+    function ajaxSavebmc_5(){
+
+        // Trigger an AJAX POST request to save the bmc_5
+        var request = $.ajax({url:"php_parsers/bmcs.php",data: {bmc_5: bmc_5.val(), id: ididea},type: "POST"});
+
+        request.done(function( msg ) {
+		  //alert( "message saved: " + msg );
+		  //$( '#bmc_5' ).val( msg );
+		});
+
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+    }
+
+    ///BMC///////////////////////////
+    var bmc_6 = $('#bmc_6');
+
+    var saveTimer;
+    var ididea = "";
+    // The input event is triggered on key press-es,
+    // cut/paste and even on undo/redo.
+
+    bmc_6.focusout(function(e){
+
+    	var split = location.search.replace('?', '').split('=');
+    	ididea = split[1];
+
+        // Clearing the timeout prevents
+        // saving on every key press
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(ajaxSavebmc_6, 2000);
+    }).trigger('input');	// This line will resize the bmc_6 on page load
+
+    function ajaxSavebmc_6(){
+
+        // Trigger an AJAX POST request to save the bmc_6
+        var request = $.ajax({url:"php_parsers/bmcs.php",data: {bmc_6: bmc_6.val(), id: ididea},type: "POST"});
+
+        request.done(function( msg ) {
+		  //alert( "message saved: " + msg );
+		  //$( '#bmc_6' ).val( msg );
+		});
+
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+    }
+
+    ///BMC///////////////////////////
+    var bmc_7 = $('#bmc_7');
+
+    var saveTimer;
+    var ididea = "";
+    // The input event is triggered on key press-es,
+    // cut/paste and even on undo/redo.
+
+    bmc_7.focusout(function(e){
+
+    	var split = location.search.replace('?', '').split('=');
+    	ididea = split[1];
+
+        // Clearing the timeout prevents
+        // saving on every key press
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(ajaxSavebmc_7, 2000);
+    }).trigger('input');	// This line will resize the bmc_7 on page load
+
+    function ajaxSavebmc_7(){
+
+        // Trigger an AJAX POST request to save the bmc_7
+        var request = $.ajax({url:"php_parsers/bmcs.php",data: {bmc_7: bmc_7.val(), id: ididea},type: "POST"});
+
+        request.done(function( msg ) {
+		  //alert( "message saved: " + msg );
+		  //$( '#bmc_7' ).val( msg );
+		});
+
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+    }
+
+    ///BMC///////////////////////////
+    var bmc_8 = $('#bmc_8');
+
+    var saveTimer;
+    var ididea = "";
+    // The input event is triggered on key press-es,
+    // cut/paste and even on undo/redo.
+
+    bmc_8.focusout(function(e){
+
+    	var split = location.search.replace('?', '').split('=');
+    	ididea = split[1];
+
+        // Clearing the timeout prevents
+        // saving on every key press
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(ajaxSavebmc_8, 2000);
+    }).trigger('input');	// This line will resize the bmc_8 on page load
+
+    function ajaxSavebmc_8(){
+
+        // Trigger an AJAX POST request to save the bmc_8
+        var request = $.ajax({url:"php_parsers/bmcs.php",data: {bmc_8: bmc_8.val(), id: ididea},type: "POST"});
+
+        request.done(function( msg ) {
+		  //alert( "message saved: " + msg );
+		  //$( '#bmc_8' ).val( msg );
+		});
+
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+    }
+
+    ///BMC///////////////////////////
+    var bmc_9 = $('#bmc_9');
+
+    var saveTimer;
+    var ididea = "";
+    // The input event is triggered on key press-es,
+    // cut/paste and even on undo/redo.
+
+    bmc_9.focusout(function(e){
+
+    	var split = location.search.replace('?', '').split('=');
+    	ididea = split[1];
+
+        // Clearing the timeout prevents
+        // saving on every key press
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(ajaxSavebmc_9, 2000);
+    }).trigger('input');	// This line will resize the bmc_9 on page load
+
+    function ajaxSavebmc_9(){
+
+        // Trigger an AJAX POST request to save the bmc_9
+        var request = $.ajax({url:"php_parsers/bmcs.php",data: {bmc_9: bmc_9.val(), id: ididea},type: "POST"});
+
+        request.done(function( msg ) {
+		  //alert( "message saved: " + msg );
+		  //$( '#bmc_9' ).val( msg );
+		});
+
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+    }
 
 function list_group_Click(id,messbox,activebox){
 	var loading_icon = '<img src="img/ajax-loader.gif">';
@@ -873,13 +1243,16 @@ function forgotpass(){
 	        if(ajaxReturn(ajax) == true) {
 				var response = $.trim(ajax.responseText);
 				if(response == "success"){
-					_("forgotpassform").innerHTML = '<h3>Step 2. Check your email inbox in a few minutes</h3><p>You can close this window or tab if you like.</p>';
+					_("forgotpassform").innerHTML = '<legend>New password generated correctly!</legend><h3>Step 2. Check your email inbox in a few minutes</h3><p>You can close this window or tab if you like.</p>';
 				} else if (response == "no_exist"){
 					_("mensaje").innerHTML = "Sorry that email address is not in our system";
+					_("forgotpassbtn").style.display = "block";
 				} else if(response == "email_send_failed"){
 					_("mensaje").innerHTML = "Mail function failed to execute";
+					_("forgotpassbtn").style.display = "block";
 				} else {
 					_("mensaje").innerHTML = response+"An unknown error occurred";
+					_("forgotpassbtn").style.display = "block";
 				}
 	        }
         }
@@ -963,7 +1336,7 @@ function AddingIdeas(){
 	var loading_icon = '<img src="img/ajax-loader.gif">'; 
 	var bn = _("brandName").value;
 	var th = _("thesis").value;
-	var d = _("description").value;
+	var d = $('#editor').html(); //_("description").value;
 	var fn = _("financialNeeds").value;
 	var ds = _("dateOfStart").value;
 	var c = _("geocomplete").value;
@@ -997,8 +1370,12 @@ function AddingIdeas(){
 	
 
 	var status = _("status");
+	/*status.innerHTML = d;
+	return false;*/
 	if(bn == "" || th == "" || d == "" || fn == "" || ds == "" || c == "" || hn == "" || sec == "" || lang == "" || inv==""){
 		status.innerHTML = "Fill out all of the form data";
+	} else if (ln == "") {
+		status.innerHTML = "Please use Google's autocomplete location";
 	} else {
 		_("subbtn").style.display = "none"; //hide singup button
 		status.innerHTML = loading_icon; //please wait or gif
@@ -1083,6 +1460,39 @@ function postPmGen(tuser,fuser,subject,ta){
 	ajax.send("action=new_pm&fuser="+fuser+"&tuser="+receiver+"&data="+data+"&data2="+data2);
 }
 
+function ideaPm(tusers,fuser,subject,ta){
+	var data = $("#ta").val();
+	var data2 = $("#subject").val();
+	if(data == "" || data2 == ""){
+		alert("Fill all fields");
+		return false;
+	}
+	_("ideapmBtn").disabled = true;
+
+	var request = $.ajax({
+		url: "php_parsers/group_pmsystem.php",
+		type: "POST",
+		data: { action: "newideaspm", fuser: fuser, tusers: tusers, text: data, subject: data2 },
+		dataType: "html"
+	});
+			 
+	request.done(function( msg ) {
+	    if($.trim(ajax.responseText) == "pm_sent"){
+				alert("Message has been sent.");
+				_("ideapmBtn").disabled = false;
+				$("#ta").val("");
+				$("#subject").val("");
+			} else {
+				alert(ajax.responseText);
+			}
+	});
+			 
+	request.fail(function( jqXHR, textStatus ) {
+		alert( "Request failed: " + textStatus );
+	});
+}
+
+
 function postPm(tuser,fuser,subject,ta){
 	var data = _(ta).value;
 	var data2 = _(subject).value;
@@ -1106,6 +1516,7 @@ function postPm(tuser,fuser,subject,ta){
 	}
 	ajax.send("action=new_pm&fuser="+fuser+"&tuser="+tuser+"&data="+data+"&data2="+data2);
 }
+
 function statusMax(field, maxlimit) {
 	if (field.value.length > maxlimit){
 		alert(maxlimit+" maximum character limit reached");
