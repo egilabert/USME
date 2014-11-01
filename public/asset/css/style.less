@@ -1,0 +1,240 @@
+@import url(http://fonts.googleapis.com/css?family=Montserrat|Raleway);
+
+//@import "../less/theme.less";
+//@import "jumbotron.css";
+
+@import "../less/bootstrap.less";
+@import "bootstrap-navbar-transparent.less";
+@import "prism.css";
+@import "chosen.css";
+@import "chosen-bootstrap.css";
+
+//@import "styleChosen.css";
+
+body {
+
+    .fixnavbar {
+        padding-top: 50px;
+    }
+    
+    .imagefit {
+        max-width:100%;
+        height: auto;
+    }
+
+    section.landing {
+
+        background-image: url("../img/1-1232109440vZAR.jpg");
+        background-repeat: no-repeat;
+        background-size:100%;
+        
+        text-align: left;
+
+        //#gradient > .radial(lighten(@link-color,20%), darken(@link-color,5%));
+
+        h1 {
+            //color: spin(@link-color, 90);
+            //color: spin(@link-color, -10%);
+            //color: darken(@link-color, 5%);
+            color: @gray-dark; //#fff
+            text-shadow: 3px 3px 2px rgba(0,0,0,0.3);
+            font-size: 8em;
+
+            strong {
+                //background-color: @link-color;
+                #translucent > .background(@link-color,0.8);
+                font-size: 3em;
+            }
+            span {
+                opacity: 50;
+                #translucent > .background(@link-color,0.8);
+                //background-color: @link-color;
+                font-size: 1.1em;
+            }
+        }
+
+        h2 {
+            //color: spin(@link-color, 90);
+            //color: spin(@link-color, -10%);
+            //color: darken(@link-color, 5%);
+            color: #fff;
+            text-shadow: 3px 3px 2px rgba(0,0,0,0.3);
+            font-size: 1.9em;
+
+            strong {
+                #translucent > .background(@link-color,0.8);
+                //background-color: @link-color;
+                font-size: 1.5em;
+                a {
+                    color: rgb(0,0,0);
+                }
+            }
+        }
+
+        .navbar.transparent.navbar-inverse .navbar-inner {
+           background: rgba(0,0,0,0.4);
+        }
+
+        padding: 21em 0;
+    }
+
+    section.grey {
+
+        background-color: lighten(@gray, 60%);
+
+    }
+
+    .magari {
+
+        padding: 0.8em;
+        #gradient > .radial(@link-color, darken(@link-color,5%));
+        //background-color: darken(@link-color, 10%);
+        border-color: darken(@link-color, 40%);
+        font-size: 30px;
+
+    }
+
+    .forze {
+
+        background-color: @gray-lighter;
+        //#gradient > .radial(#fff, @gray-lighter);
+        padding: 0.8em;
+        font-size: 30px;
+
+    }
+
+    .padding {
+        padding: 8em 0;
+
+        form {
+            display: block;
+        }
+    }
+    .theme {
+        background-color: lighten(@link-color, 60%);
+    }
+
+    .theme2 {
+        background-color: lighten(@gray-dark, 10%);
+        color: #fff;
+    }
+    footer.padding {
+
+        #gradient > .vertical(@gray-darker, @gray-dark);
+        color: #fff;
+        padding: 1em 0;
+    }
+    //padding-top: 70px;
+    .text-big {
+                font-size: 400px;
+                line-height: 320px;
+    }
+
+    .text-small {
+                font-size: 12px;
+                font-family: "Montserrat";
+                padding: 3px 0;
+                margin-left: 1em;
+                //line-height: 160px;
+    }
+
+    .ressset {
+        margin-bottom: 0px;
+    }
+
+    .home_welcome {
+        padding: 3em 0;
+    }
+
+    .small_padding {
+        padding: 2em 0;
+    }
+    
+    .small_margin {
+        margin: 1em 20em;
+    }
+
+    .small_padding_tittles {
+        padding: 2px 0;
+    }
+
+}
+
+/* Escritorio */  
+@media (min-width: 980px) {
+    /*body{color: black;}*/
+}
+/* Escritorio pequeño o una tablet horizontal */
+@media (min-width: 768px) and (max-width: 979px) {
+    /*body{color: red;}*/
+}
+/* tablet vertical o smartphone horizontal */
+@media (max-width: 767px) {
+    /*body{color: green;}*/
+}
+/* Smartphone */
+    @media (max-width: 480px) {
+}
+
+body .user_pic {
+  width: 50px;
+  height: 50px;
+}
+
+body .user_pic_home {
+  height: auto;
+    width: 150px;
+}
+
+body .user_pic_contacts {
+  height: auto;
+    width: 200px;
+}
+
+.popover{
+    width:400px;
+    height:auto;    
+}
+
+/*Image loading Style */
+
+div#profile_pic_box{float:right; width:200px; height:200px; margin:20px 30px 0px 0px; overflow-y:hidden;}
+div#profile_pic_box > img{z-index:2000; width:200px;}
+div#profile_pic_box > a {
+  display: none;
+  position:absolute; 
+  margin:140px 0px 0px 120px;
+  z-index:4000;
+  background:lighten(@link-color,60%);;
+  border:@link-color 1px solid;
+  border-radius:3px;
+  padding:5px;
+  font-size:12px;
+  text-decoration:none;
+  color:@link-color;
+}
+div#profile_pic_box > form{
+  display:none;
+  position:absolute; 
+  z-index:3000;
+  padding:10px;
+  opacity:.8;
+  background:darken(@link-color,10%);
+  width:200px;
+  height:200px;
+}
+div#profile_pic_box:hover a {
+    display: block;
+}
+img.friendpics{border:#000 1px solid; width:40px; height:40px; margin:2px;}
+
+
+/*Conversation Style */
+textarea#statustext{padding:1em; width:100%; height:80px; padding:8px; border:#999 1px solid; font-size:16px;}
+div.status_boxes{padding:12px; line-height:1.5em;}
+div.status_boxes > div{padding:8px; border:#99C20C 1px solid; background: #F4FDDF;}
+div.status_boxes > div > b{font-size:12px;}
+div.status_boxes > button{padding:5px; font-size:12px;}
+textarea.replytext{width:98%; height:40px; padding:1%; border:#999 1px solid;}
+div.reply_boxes{padding:12px; border:#999 1px solid; background:#F5F5F5;}
+div.reply_boxes > div > b{font-size:12px;}

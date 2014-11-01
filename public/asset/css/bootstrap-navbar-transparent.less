@@ -1,0 +1,179 @@
+// Transparent navbar
+//
+// Reset transparent navbar basics
+@navbar-transparent-color:                      transparent;
+@navbar-transparent-bg:                         transparent;
+@navbar-transparent-border:                     transparent;
+
+// Transparent navbar links
+@navbar-transparent-link-color:                 @gray-dark;
+@navbar-transparent-link-hover-color:           darken(@gray-dark,15%);
+@navbar-transparent-link-hover-bg:              transparent;
+@navbar-transparent-link-active-color:          #fff;
+@navbar-transparent-link-active-bg:             transparent;
+@navbar-transparent-link-disabled-color:        #fff;
+@navbar-transparent-link-disabled-bg:           transparent;
+
+// Transparent navbar brand label
+@navbar-transparent-brand-color:                #fff;
+@navbar-transparent-brand-hover-color:          #fff;
+@navbar-transparent-brand-hover-bg:             transparent;
+
+// Transparent navbar search
+// Normal navbar needs no special styles or vars
+@navbar-transparent-search-bg:                  #fff;
+@navbar-transparent-search-bg-focus:            #fff;
+@navbar-transparent-search-border:              #fff;
+@navbar-transparent-search-placeholder-color:   #fff;
+
+// Transparent navbar toggle
+@navbar-transparent-toggle-hover-bg:            transparent;
+@navbar-transparent-toggle-icon-bar-bg:         #fff;
+@navbar-transparent-toggle-border-color:        #fff;
+
+
+// !custom
+
+.navbar-transparent{
+  .navbar-nav:hover a {
+    opacity:0.8;
+  }
+  .navbar-nav:hover a:hover {
+      opacity:1;
+  }
+}
+
+// transparent navbar
+
+.navbar-transparent {
+  background-color: @navbar-transparent-bg;
+  border-color: @navbar-transparent-border;
+
+  .navbar-brand {
+    color: @navbar-transparent-brand-color;
+    &:hover,
+    &:focus {
+      color: @navbar-transparent-brand-hover-color;
+      background-color: @navbar-transparent-brand-hover-bg;
+    }
+  }
+
+  .navbar-text {
+    color: @navbar-transparent-color;
+  }
+
+  .navbar-nav {
+    > li > a {
+      color: @navbar-transparent-link-color;
+
+      &:hover,
+      &:focus {
+        color: @navbar-transparent-link-hover-color;
+        background-color: @navbar-transparent-link-hover-bg;
+      }
+    }
+    > .active > a {
+      &,
+      &:hover,
+      &:focus {
+        color: @navbar-transparent-link-active-color;
+        background-color: @navbar-transparent-link-active-bg;
+      }
+    }
+    > .disabled > a {
+      &,
+      &:hover,
+      &:focus {
+        color: @navbar-transparent-link-disabled-color;
+        background-color: @navbar-transparent-link-disabled-bg;
+      }
+    }
+  }
+
+  // Darken the responsive nav toggle
+  .navbar-toggle {
+    border-color: @navbar-transparent-toggle-border-color;
+    &:hover,
+    &:focus {
+      background-color: @navbar-transparent-toggle-hover-bg;
+    }
+    .icon-bar {
+      background-color: @navbar-transparent-toggle-icon-bar-bg;
+    }
+  }
+
+  .navbar-collapse,
+  .navbar-form {
+    border-color: darken(@navbar-transparent-bg, 7%);
+  }
+
+  // Dropdowns
+  .navbar-nav {
+    > .open > a {
+      &,
+      &:hover,
+      &:focus {
+        background-color: @navbar-transparent-link-active-bg;
+        color: @navbar-transparent-link-active-color;
+      }
+    }
+    > .dropdown > a:hover .caret {
+      border-top-color: @navbar-transparent-link-hover-color;
+      border-bottom-color: @navbar-transparent-link-hover-color;
+    }
+    > .dropdown > a .caret {
+      border-top-color: @navbar-transparent-link-color;
+      border-bottom-color: @navbar-transparent-link-color;
+    }
+    > .open > a {
+      &,
+      &:hover,
+      &:focus {
+        .caret {
+          border-top-color: @navbar-transparent-link-active-color;
+          border-bottom-color: @navbar-transparent-link-active-color;
+        }
+      }
+    }
+
+    @media (max-width: @screen-xs-max) {
+      // Dropdowns get custom display
+      .open .dropdown-menu {
+        > .dropdown-header {
+          border-color: @navbar-transparent-border;
+        }
+        > li > a {
+          color: @navbar-transparent-link-color;
+          &:hover,
+          &:focus {
+            color: @navbar-transparent-link-hover-color;
+            background-color: @navbar-transparent-link-hover-bg;
+          }
+        }
+        > .active > a {
+          &,
+          &:hover,
+          &:focus {
+            color: @navbar-transparent-link-active-color;
+            background-color: @navbar-transparent-link-active-bg;
+          }
+        }
+        > .disabled > a {
+          &,
+          &:hover,
+          &:focus {
+            color: @navbar-transparent-link-disabled-color;
+            background-color: @navbar-transparent-link-disabled-bg;
+          }
+        }
+      }
+    }
+  }
+
+  .navbar-link {
+    color: @navbar-transparent-link-color;
+    &:hover {
+      color: @navbar-transparent-link-hover-color;
+    }
+  }
+}
